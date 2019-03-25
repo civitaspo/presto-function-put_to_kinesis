@@ -1,0 +1,55 @@
+plugins {
+    id "scala"
+    id "com.diffplug.gradle.spotless" version "3.13.0"
+    id "com.adarshr.test-logger" version "1.6.0"  // For Pretty test logging
+}
+repositories {
+    mavenCentral()
+    jcenter()
+}
+configurations {
+    provided
+}
+
+version = "0.0.1"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    // TODO: Follow the latest version of Presto that has different package name.
+    //       Currently follow the latast version of Presto on EMR.
+    //       https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-release-5x.html
+    compile 'com.facebook.presto:presto-spi:0.215'
+    provided 'com.facebook.presto:presto-spi:0.215'
+    testCompile 'com.facebook.presto:presto-tests:0.215'
+
+    compile 'org.scala-lang:scala-library:2.12.8'
+    provided 'org.scala-lang:scala-library:2.12.8'
+
+    compile 'com.amazonaws:amazon-kinesis-producer:0.12.11'
+
+    testCompile 'org.scalatest:scalatest_2.12:3.0.5'
+    testCompile 'cloud.localstack:localstack-utils:0.1.15'
+}
+
+testlogger {
+    theme "mocha"
+}
+
+task classpath(type: Copy, dependsOn: ["jar"]) {
+    doFirst { file("classpath").deleteDir() }
+    from (configurations.runtime - configurations.provided + files(jar.archivePath))
+    into "classpath"
+}
+clean { delete "classpath" }
+
+task pkg(type: Tar, dependsOn: ["classpath"]) {
+    extension = 'tgz'
+    baseName = project.name
+    compression = Compression.GZIP
+
+    into('put_to_kinesis') { from 'classpath/' }
+
+    destinationDir file('pkg')
+}
