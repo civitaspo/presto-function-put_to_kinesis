@@ -16,6 +16,7 @@ public class PutToKinesisPlugin
     {
         return ImmutableSet.<Class<?>>builder()
                 .add(HelloFunction.class)
+                .add(PutToKinesisFunction.class)
                 .build();
     }
 }
