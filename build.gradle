@@ -30,21 +30,37 @@ dependencies {
     compile 'com.amazonaws:amazon-kinesis-producer:0.12.11'
 
     testCompile 'org.scalatest:scalatest_2.12:3.0.5'
+    testCompile 'junit:junit:4.12'
     testCompile 'cloud.localstack:localstack-utils:0.1.15'
+}
+
+test {
+    useTestNG()
 }
 
 testlogger {
     theme "mocha"
 }
 
-task classpath(type: Copy, dependsOn: ["jar"]) {
+// NOTE: To compile Scala sources before compiling Java sources,
+//       because the Plugin class depends on Scala compiled classes.
+sourceSets.main {
+    scala { srcDirs = ['src/main/scala', 'src/main/java'] }
+    java { srcDirs = [] }
+}
+
+task classpath(type: Copy, dependsOn: ["clean", "jar"]) {
     doFirst { file("classpath").deleteDir() }
     from (configurations.runtime - configurations.provided + files(jar.archivePath))
     into "classpath"
 }
 clean { delete "classpath" }
 
-task pkg(type: Tar, dependsOn: ["classpath"]) {
+task pkg(type: Tar, dependsOn: ["clean", "classpath"]) {
+    doFirst {
+        file("pkg").deleteDir()
+        file("pkg").mkdir()
+    }
     extension = 'tgz'
     baseName = project.name
     compression = Compression.GZIP
@@ -53,3 +69,4 @@ task pkg(type: Tar, dependsOn: ["classpath"]) {
 
     destinationDir file('pkg')
 }
+clean { delete "pkg" }
