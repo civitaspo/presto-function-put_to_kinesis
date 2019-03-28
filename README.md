@@ -1,13 +1,12 @@
-presto-udf-put_to_kinesis
+presto-udf-skeleton
 ==============================
 
-A Presto UDF Plugin to put records into Kinesis streams.
+A skeleton to create A Presto UDF Plugin.
 
 # Usage
 
 ```
-SELECT put_to_kinesis('stream_name', col)
-  FROM ...
+TBD...
 ```
 
 # Configurations
@@ -26,7 +25,7 @@ The below command creates dependency jars into `classpath`.
 
 # Package for Presto
 
-The below command creates dependency jars as a archive `pkg/presto-udf-put_to_kinesis-X.Y.Z.tgz`, so you can extract and put them into `/usr/lib/presto/plugin` on your Presto servers.
+The below command creates dependency jars as a archive `pkg/presto-udf-skeleton-X.Y.Z.tgz`, so you can extract and put them into `/usr/lib/presto/plugin` on your Presto servers.
 
 ```
 ./gradlew pkg
